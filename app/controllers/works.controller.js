@@ -53,6 +53,34 @@ exports.findAll = async (req, res) => {
   }
 };
 
+// Update a Work by the id in the request
+exports.update = async (req, res) => {
+  if (!req.body) {
+    return res.status(400).send({
+      message: "Data to update can not be empty!"
+    });
+  }
+
+  const id = req.params.id;
+
+  try {
+    const data = await Works.findByIdAndUpdate(
+      id,
+      req.body,
+      { useFindAndModify: false }
+    );
+    if (!data) {
+      res.status(404).send({
+        message: `Cannot update Work with id=${id}. Maybe Work was not found!`
+      });
+    } else res.send({ message: "Work was updated successfully." });
+  } catch(err) {
+    res.status(500).send({
+      message: "Error updating Work with id=" + id
+    });
+  }
+};
+
 // Delete a Work with the specified id in the request
 exports.delete = async (req, res) => {
   const id = req.params.id;

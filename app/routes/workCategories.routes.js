@@ -9,5 +9,8 @@ module.exports = app => {
   // Retrieve all Work Categories
   router.get("/", workCategories.findAll);
 
+  // Delete a Work Category with id
+  router.delete("/:id", workCategories.delete);
+
   app.use('/api/workCategories', router);
 }

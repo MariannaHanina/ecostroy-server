@@ -39,3 +39,46 @@ exports.findAll = async (req, res) => {
     });
   }
 };
+
+// Delete a Material Category with the specified id in the request
+// and Subcategories for this category
+exports.delete = async (req, res) => {
+
+  async function findAndDeleteSubItems(id) {
+    try {
+      const subcategoriesData = await MaterialCategories.find({parent: id});
+      console.log('subcategoriesData', subcategoriesData);
+
+      if (!subcategoriesData.length) return;
+
+      subcategoriesData.forEach(async (item, i) => {
+        await MaterialCategories.findByIdAndRemove(item._id, { useFindAndModify: false });
+        await findAndDeleteSubItems(item._id);
+      });
+    } catch(err) {
+      console.log(err);
+    }
+  }
+
+  const id = req.params.id;
+
+  try {
+
+    await findAndDeleteSubItems(id);
+    const data = await MaterialCategories.findByIdAndRemove(id, { useFindAndModify: false });
+
+    if (!data) {
+      res.status(404).send({
+        message: `Cannot delete Material category with id=${id}. Maybe Material category was not found!`
+      });
+    } else {
+      res.send({
+        message: "Material category was deleted successfully!"
+      });
+    }
+  } catch(err) {
+    res.status(500).send({
+      message: "Could not delete Material category with id=" + id
+    });
+  }
+};

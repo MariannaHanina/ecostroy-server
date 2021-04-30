@@ -9,5 +9,8 @@ module.exports = app => {
   // Retrieve all Material Categories
   router.get("/", materialCategories.findAll);
 
+  // Delete a Material Category with id
+  router.delete("/:id", materialCategories.delete);
+
   app.use('/api/materialCategories', router);
 }

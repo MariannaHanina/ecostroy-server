@@ -9,6 +9,9 @@ module.exports = app => {
   // Retrieve all Works
   router.get("/", works.findAll);
 
+  // Update a Work with id
+  router.put("/:id", works.update);
+
   // Delete a Work with id
   router.delete("/:id", works.delete);
 

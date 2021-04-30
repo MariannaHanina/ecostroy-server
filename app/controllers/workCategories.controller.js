@@ -39,3 +39,46 @@ exports.findAll = async (req, res) => {
     });
   }
 };
+
+// Delete a Work Category with the specified id in the request
+// and Subcategories for this category
+exports.delete = async (req, res) => {
+
+  async function findAndDeleteSubItems(id) {
+    try {
+      const subcategoriesData = await WorkCategories.find({parent: id});
+      console.log('subcategoriesData', subcategoriesData);
+
+      if (!subcategoriesData.length) return;
+
+      subcategoriesData.forEach(async (item, i) => {
+        await WorkCategories.findByIdAndRemove(item._id, { useFindAndModify: false });
+        await findAndDeleteSubItems(item._id);
+      });
+    } catch(err) {
+      console.log(err);
+    }
+  }
+
+  const id = req.params.id;
+
+  try {
+
+    await findAndDeleteSubItems(id);
+    const data = await WorkCategories.findByIdAndRemove(id, { useFindAndModify: false });
+
+    if (!data) {
+      res.status(404).send({
+        message: `Cannot delete Work Category with id=${id}. Maybe Work Category was not found!`
+      });
+    } else {
+      res.send({
+        message: "Work Category was deleted successfully!"
+      });
+    }
+  } catch(err) {
+    res.status(500).send({
+      message: "Could not delete Work Category with id=" + id
+    });
+  }
+};

@@ -61,7 +61,6 @@ exports.update = async (req, res) => {
   }
 
   const id = req.params.id;
-  console.log(req.body);
 
   try {
     const data = await Materials.findByIdAndUpdate(
@@ -75,7 +74,6 @@ exports.update = async (req, res) => {
       });
     } else res.send({ message: "Material was updated successfully." });
   } catch(err) {
-    console.log(err);
     res.status(500).send({
       message: "Error updating Material with id=" + id
     });
