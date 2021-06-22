@@ -74,6 +74,7 @@ app.get("/", (req, res) => {
   res.json({ message: "Welcome to Ecostroy server application."});
 });
 
+require("./app/routes/fileUploader.routes.js")(app);
 require("./app/routes/content.routes.js")(app);
 require("./app/routes/menu.routes.js")(app);
 require("./app/routes/slogans.routes.js")(app);

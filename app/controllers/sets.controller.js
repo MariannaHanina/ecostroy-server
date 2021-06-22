@@ -14,24 +14,40 @@ exports.create = async (req, res) => {
     name: req.body.name,
     sale: req.body.sale,
     descriptionForSite: req.body.descriptionForSite,
-    imagesForSite: req.body.imagesForSite,
+    imagesForSite: req.body.imagesForSite || [],
     videoForSite: req.body.videoForSite,
     descriptionForAdmin: req.body.descriptionForAdmin,
-    imagesForAdmin: req.body.imagesForAdmin,
-    works:req.body.works.map(w => w._id)
+    imagesForAdmin: req.body.imagesForAdmin || [],
+    works: (req.body.works && req.body.works.length) ? req.body.works.map(w => w._id) : []
   });
 
+  let data;
   // Save Set in the database
   try{
-    let data = await set.save(set);
-    await data
-      .populate('works')
-      .execPopulate();
-    res.send(data);
+     data = await set.save(set);
   } catch(err) {
     res.status(500).send({
       message:
         err.message || "Some error occurred white creating the Set."
+    });
+  }
+
+  try {
+    await data
+    .populate({
+      path: 'works',
+      model: 'works',
+      populate: {
+        path: 'category',
+        model: 'workCategories'
+
+      }
+    });
+    res.send(data);
+  } catch(err) {
+    res.status(500).send({
+      message:
+        err.message || "Some error occurred while retrieving the Set."
     });
   }
 };
